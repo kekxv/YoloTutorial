@@ -1,0 +1,10 @@
+driving-license
+driving-license-back
+driver-license
+driver-license-back
+idcard
+idcard-back
+passport
+HongKong-Macao-Taiwan-Pass
+Taiwan-Back-Pass
+Taiwan-Back-Pass-back

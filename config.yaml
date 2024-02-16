@@ -1,0 +1,16 @@
+path: ./
+train: images/train/
+val: images/train/
+test: images/test/
+
+names:
+  0: driving-license
+  1: driving-license-back
+  2: driver-license
+  3: driver-license-back
+  4: idcard
+  5: idcard-back
+  6: passport
+  7: HongKong-Macao-Taiwan-Pass
+  8: Taiwan-Back-Pass
+  9: Taiwan-Back-Pass-back
