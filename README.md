@@ -34,6 +34,95 @@
 
 ## 开始准备
 
+### 样本收集
+
+需要准备训练样本，这个根据情况进行收集，前期做验证，可以考虑通过搜索引擎进行搜集，注意来源数据是否涉及版权以及个人隐私问题，请不要公开发布涉及版权以及个人隐私问题。
+
+本项目提供的证件样本，均通过搜索引擎从公开网站所获取。（如果提供的样张涉及到版权或者隐私问题，请发`issue`，将会进行处理。）
+
+将收集到的训练样本，放到 `datasets/images/train`，想要做测试的样本，放到`datasets/images/test`里面。
+
+### 开始标注
+
+可以根据自己的实际情况进行标注，当前项目可以考虑使用`labelImg` 工具进行标注。执行以下命令，将会启动`labelImg`标注工具。
+
+```shell
+make labelImg
+```
+
+> `labelImg` 快捷键：
+>
+> `A` 上一张
+>
+> `D` 下一张
+>
+> `W` 画框
+>
+> 建议打开自动保存
+>
+
+### 开始训练
+
+标注完成之后，就可以开始训练了：
+
+```shell
+# 训练 epochs 10 
+# make train-10
+# 训练
+make train
+```
+
+训练的结果大概是：
+
+``` 
+196 epochs completed in 2.217 hours.
+Optimizer stripped from runs/detect/train/weights/last.pt, 6.3MB
+Optimizer stripped from runs/detect/train/weights/best.pt, 6.3MB
+
+Validating runs/detect/train/weights/best.pt...
+Ultralytics YOLOv8.1.11 🚀 Python-3.9.6 torch-2.2.0 CPU (Apple M1)
+Model summary (fused): 168 layers, 3007598 parameters, 0 gradients, 8.1 GFLOPs
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100%|██████████| 3/3 [00:10<00:00,  3.39s/it]
+                   all           72         95       0.98      0.986      0.995      0.987
+       driving-license           72          8      0.977          1      0.995      0.995
+  driving-license-back           72          7      0.995          1      0.995      0.995
+        driver-license           72         15      0.992          1      0.995      0.983
+   driver-license-back           72          6      0.957          1      0.995      0.995
+                idcard           72         16      0.994          1      0.995      0.985
+           idcard-back           72          3      0.925          1      0.995      0.995
+              passport           72         16      0.985          1      0.995      0.987
+HongKong-Macao-Taiwan-Pass       72         20      0.998          1      0.995      0.975
+ Taiwan-Back-Pass-back           72          4          1      0.874      0.995       0.97
+Speed: 1.0ms preprocess, 132.0ms inference, 0.0ms loss, 0.4ms postprocess per image
+Results saved to runs/detect/train
+💡 Learn more at https://docs.ultralytics.com/modes/train
+#yolo task=detect mode=train weight_decay=0.001 box=4.5 model=yolov8x.pt data=config.yaml batch=-1 imgsz=640 epochs=10
+```
+
+如果没有出现报错，则表示训练完成。
+
+### 测试模型
+
+测试模型效果，可以将图片放到 `datasets/images/test` ，然后执行：
+
+```shell
+make test
+```
+
+测试的结果将会保存在目录`runs/detect/predict(序号)`，根据输出的日志查看。
+
+如果效果可以，则可以考试正式的数据训练😁。
+
+### 导出为 ONNX
+
+默认的模型格式为`.pt`，如果是服务器进行识别，则可以考虑直接使用，如果是想要边缘计算或者不想使用`.pt`
+的模型，可以考虑导出为`onnx`模型，只需要执行:
+
+```shell
+make onnx
+```
+
+则可以直接导出为`onnx`格式模型。
 
 ## 额外说明
 

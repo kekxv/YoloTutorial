@@ -39,6 +39,12 @@ train:
     # 根据自己的情况修改对应的参数
 	yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
 
+# 开始训练 epochs
+train-10:
+	. env/bin/activate
+    # 根据自己的情况修改对应的参数
+	yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
+
 # 测试训练出来的模型
 test:
 	. env/bin/activate
@@ -61,6 +67,12 @@ env:
 # 启动分类标注工具
 labelImg: datasets/labels/train/classes.txt
 	labelImg datasets/images/train datasets/labels/train/classes.txt datasets/labels/train/
+# 启动分类标注工具
+labelImg-val: datasets/labels/train/classes.txt
+	labelImg datasets/images/val datasets/labels/train/classes.txt datasets/labels/val/
+# 启动分类标注工具
+labelImg-test: datasets/labels/train/classes.txt
+	labelImg datasets/images/test datasets/labels/train/classes.txt datasets/labels/test/
 
 # 分类的文件
 datasets/labels/train/classes.txt:

@@ -1,5 +1,6 @@
 path: ./
 train: images/train/
+# 可以改为 images/val
 val: images/train/
 test: images/test/
 
