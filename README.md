@@ -72,27 +72,17 @@ make labelImg
 make train
 ```
 
+如果出现`Dataset 'config.yaml' images not found ⚠️, missing path`则可能路径识别错误，请将`config.yaml`的`path`改为`datasets`目录的绝对路径。
+
+
 训练的结果大概是：
 
 ``` 
 196 epochs completed in 2.217 hours.
 Optimizer stripped from runs/detect/train/weights/last.pt, 6.3MB
 Optimizer stripped from runs/detect/train/weights/best.pt, 6.3MB
-
+ ..... 
 Validating runs/detect/train/weights/best.pt...
-Ultralytics YOLOv8.1.11 🚀 Python-3.9.6 torch-2.2.0 CPU (Apple M1)
-Model summary (fused): 168 layers, 3007598 parameters, 0 gradients, 8.1 GFLOPs
-                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100%|██████████| 3/3 [00:10<00:00,  3.39s/it]
-                   all           72         95       0.98      0.986      0.995      0.987
-       driving-license           72          8      0.977          1      0.995      0.995
-  driving-license-back           72          7      0.995          1      0.995      0.995
-        driver-license           72         15      0.992          1      0.995      0.983
-   driver-license-back           72          6      0.957          1      0.995      0.995
-                idcard           72         16      0.994          1      0.995      0.985
-           idcard-back           72          3      0.925          1      0.995      0.995
-              passport           72         16      0.985          1      0.995      0.987
-HongKong-Macao-Taiwan-Pass       72         20      0.998          1      0.995      0.975
- Taiwan-Back-Pass-back           72          4          1      0.874      0.995       0.97
 Speed: 1.0ms preprocess, 132.0ms inference, 0.0ms loss, 0.4ms postprocess per image
 Results saved to runs/detect/train
 💡 Learn more at https://docs.ultralytics.com/modes/train

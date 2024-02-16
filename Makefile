@@ -27,38 +27,32 @@ clean-all: clean
 
 # 安装依赖
 install-dev: env
-	. env/bin/activate
-	python -m pip install labelimg
-	python -m pip install ultralytics
-	python -m pip install onnx
+	. env/bin/activate && python -m pip install labelimg
+	. env/bin/activate && python -m pip install ultralytics
+	. env/bin/activate && python -m pip install onnx
 
 # 开始训练
 train:
-	. env/bin/activate
 	#rm -rf ./runs/detect/train*
     # 根据自己的情况修改对应的参数
-	yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
+	. env/bin/activate && yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
 
 # 开始训练 epochs
 train-10:
-	. env/bin/activate
     # 根据自己的情况修改对应的参数
-	yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
+	. env/bin/activate &&  yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
 
 # 测试训练出来的模型
 test:
-	. env/bin/activate
-	yolo detect predict model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
+	. env/bin/activate && yolo detect predict model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
 
 # 验证训练内容
 val:
-	. env/bin/activate
-	yolo detect val data=config.yaml model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)  # val custom model
+	. env/bin/activate && yolo detect val data=config.yaml model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)  # val custom model
 
 # 导出 onnx 模型
 onnx:
-	. env/bin/activate
-	yolo export model=runs/detect/$(train_dir)/weights/best.pt format=onnx
+	. env/bin/activate && yolo export model=runs/detect/$(train_dir)/weights/best.pt format=onnx
 
 # 创建虚拟环境
 env:
@@ -66,13 +60,13 @@ env:
 
 # 启动分类标注工具
 labelImg: datasets/labels/train/classes.txt
-	labelImg datasets/images/train datasets/labels/train/classes.txt datasets/labels/train/
+	. env/bin/activate && labelImg datasets/images/train datasets/labels/train/classes.txt datasets/labels/train/
 # 启动分类标注工具
 labelImg-val: datasets/labels/train/classes.txt
-	labelImg datasets/images/val datasets/labels/train/classes.txt datasets/labels/val/
+	. env/bin/activate && labelImg datasets/images/val datasets/labels/train/classes.txt datasets/labels/val/
 # 启动分类标注工具
 labelImg-test: datasets/labels/train/classes.txt
-	labelImg datasets/images/test datasets/labels/train/classes.txt datasets/labels/test/
+	. env/bin/activate && labelImg datasets/images/test datasets/labels/train/classes.txt datasets/labels/test/
 
 # 分类的文件
 datasets/labels/train/classes.txt:
