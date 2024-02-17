@@ -3,6 +3,8 @@ current_dir := $(dir $(mkfile_path))
 
 cos_lr=True
 weight_decay=0.001
+# 识别的阈值
+predict_conf=0.50
 box=5.0
 # 基础模型文件 yolov8n.pt 是最快的
 model=yolov8n.pt
@@ -52,7 +54,7 @@ train-10: update-config
 
 # 测试训练出来的模型
 test: update-config
-	. env/bin/activate && yolo detect predict model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
+	. env/bin/activate && yolo detect predict conf=$(predict_conf) model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
 
 # 验证训练内容
 val: update-config
