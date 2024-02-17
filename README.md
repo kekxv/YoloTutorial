@@ -72,8 +72,8 @@ make labelImg
 make train
 ```
 
-如果出现`Dataset 'config.yaml' images not found ⚠️, missing path`则可能路径识别错误，请将`config.yaml`的`path`
-改为`datasets`目录的绝对路径。
+~~如果出现`Dataset 'config.yaml' images not found ⚠️, missing path`则可能路径识别错误，请将`config.yaml`的`path`
+改为`datasets`目录的绝对路径。~~ 增加动态修改为当前位置的配置，应该不会再出现这个问题。
 
 训练的结果大概是：
 

@@ -17,6 +17,11 @@ epochs=100
 # 训练的结果文件夹，多次训练的文件夹不一样
 train_dir=train
 
+weights_dir=$(current_dir)weights
+datasets_dir=$(current_dir)datasets
+runs_dir=$(current_dir)runs
+
+
 all:
 
 # 清理缓存
@@ -35,27 +40,32 @@ install-dev: env
 	. env/bin/activate && python -m pip install onnx
 
 # 开始训练
-train:
+train: update-config
 	#rm -rf ./runs/detect/train*
     # 根据自己的情况修改对应的参数
 	. env/bin/activate && yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
 
 # 开始训练 epochs
-train-10:
+train-10: update-config
     # 根据自己的情况修改对应的参数
 	. env/bin/activate &&  yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
 
 # 测试训练出来的模型
-test:
+test: update-config
 	. env/bin/activate && yolo detect predict model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
 
 # 验证训练内容
-val:
+val: update-config
 	. env/bin/activate && yolo detect val data=$(config_file) model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)  # val custom model
 
 # 导出 onnx 模型
-onnx:
+onnx: update-config
 	. env/bin/activate && yolo export model=runs/detect/$(train_dir)/weights/best.pt format=onnx
+
+
+update-config:
+	. env/bin/activate && yolo settings weights_dir=$(weights_dir) datasets_dir=$(datasets_dir) runs_dir=$(runs_dir)
+
 
 # 创建虚拟环境
 env:
