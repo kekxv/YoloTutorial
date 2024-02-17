@@ -1,10 +1,13 @@
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+current_dir := $(dir $(mkfile_path))
+
 cos_lr=True
 weight_decay=0.001
 box=5.0
 # 基础模型文件 yolov8n.pt 是最快的
 model=yolov8n.pt
 # 配置文件，里面包含了 class
-config_file=config.yaml
+config_file=$(current_dir)config.yaml
 # batch
 batch=-1
 # 图片大小
@@ -48,7 +51,7 @@ test:
 
 # 验证训练内容
 val:
-	. env/bin/activate && yolo detect val data=config.yaml model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)  # val custom model
+	. env/bin/activate && yolo detect val data=$(config_file) model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)  # val custom model
 
 # 导出 onnx 模型
 onnx:

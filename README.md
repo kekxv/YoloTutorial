@@ -72,8 +72,8 @@ make labelImg
 make train
 ```
 
-如果出现`Dataset 'config.yaml' images not found ⚠️, missing path`则可能路径识别错误，请将`config.yaml`的`path`改为`datasets`目录的绝对路径。
-
+如果出现`Dataset 'config.yaml' images not found ⚠️, missing path`则可能路径识别错误，请将`config.yaml`的`path`
+改为`datasets`目录的绝对路径。
 
 训练的结果大概是：
 
@@ -115,6 +115,15 @@ make onnx
 则可以直接导出为`onnx`格式模型。
 
 ## 额外说明
+
+### 支持系统
+
+目前只在 `Linux`以及`macOS`测试，`windows`可以考虑使用 `wsl` 进行训练。后续增加`windows`支持。
+
+### 训练卡住问题
+
+如果开始训练出现卡住的问题，可能是无法访问`https://ultralytics.com`
+，可以检查一下网络环境，或者尝试将[front/Arial.ttf](front%2FArial.ttf)字体加入到系统。再进行训练
 
 ### 关于 `labelImg`
 
