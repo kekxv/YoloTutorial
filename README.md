@@ -118,7 +118,11 @@ make onnx
 
 ### 支持系统
 
-目前只在 `Linux`以及`macOS`测试，`windows`可以考虑使用 `wsl` 进行训练。后续增加`windows`支持。
+目前只在 `Linux`以及`macOS`测试，~~`windows`可以考虑使用 `wsl` 进行训练。后续增加`windows`支持。~~ windows 建议使用`wsl`，或者 `powershell` 进行操作。
+
+### windows系统注意
+
+需要手动安装 `python3`，`make`，`cmake`（用于`onnx`，如果不需要可以不装）。
 
 ### 训练卡住问题
 

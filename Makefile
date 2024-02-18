@@ -1,6 +1,19 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(dir $(mkfile_path))
 
+ifeq ($(OS),Windows_NT)
+ PLATFORM=win
+ env_activate= .\env\Scripts\activate.bat
+else
+ env_activate= . env/bin/activate
+ ifeq ($(shell uname),Darwin)
+  #PLATFORM=MacOS
+  PLATFORM=unix
+ else
+  PLATFORM=unix
+ endif
+endif
+
 cos_lr=True
 weight_decay=0.001
 # 识别的阈值
@@ -23,50 +36,51 @@ weights_dir=$(current_dir)weights
 datasets_dir=$(current_dir)datasets
 runs_dir=$(current_dir)runs
 
+remove_cmd=rm -rf
+#remove_cmd=del
 
 all:
+	@echo $(PLATFORM)
 
 # 清理缓存
 clean:
-	rm -rf ./runs/detect/predict*
-	rm -rf ./runs/detect/val*
+	$(remove_cmd) ./runs/detect/predict*
+	$(remove_cmd) ./runs/detect/val*
 
 # 清理所有缓存
 clean-all: clean
-	rm -rf ./runs/detect/train*
+	$(remove_cmd) ./runs/detect/train*
 
 # 安装依赖
 install-dev: env
-	. env/bin/activate && python -m pip install labelimg
-	. env/bin/activate && python -m pip install ultralytics
-	. env/bin/activate && python -m pip install onnx
+	$(env_activate) && python -m pip install setuptools
+	$(env_activate) && python -m pip install labelimg
+	$(env_activate) && python -m pip install ultralytics
+	$(env_activate) && python -m pip install onnx
 
 # 开始训练
-train: update-config
-	#rm -rf ./runs/detect/train*
-    # 根据自己的情况修改对应的参数
-	. env/bin/activate && yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
+train: update-config clean-all
+	$(env_activate) && yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
 
 # 开始训练 epochs
 train-10: update-config
-    # 根据自己的情况修改对应的参数
-	. env/bin/activate &&  yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
+	$(env_activate) &&  yolo task=detect mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
 
 # 测试训练出来的模型
 test: update-config
-	. env/bin/activate && yolo detect predict conf=$(predict_conf) model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
+	$(env_activate) && yolo detect predict conf=$(predict_conf) model=runs/detect/$(train_dir)/weights/best.pt source=./datasets/images/test
 
 # 验证训练内容
 val: update-config
-	. env/bin/activate && yolo detect val data=$(config_file) model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)  # val custom model
+	$(env_activate) && yolo detect val data=$(config_file) model=runs/detect/$(train_dir)/weights/best.pt imgsz=$(imgsz)
 
 # 导出 onnx 模型
 onnx: update-config
-	. env/bin/activate && yolo export model=runs/detect/$(train_dir)/weights/best.pt format=onnx
+	$(env_activate) && yolo export model=runs/detect/$(train_dir)/weights/best.pt format=onnx
 
 
 update-config:
-	. env/bin/activate && yolo settings weights_dir=$(weights_dir) datasets_dir=$(datasets_dir) runs_dir=$(runs_dir)
+	$(env_activate) && yolo settings weights_dir=$(weights_dir) datasets_dir=$(datasets_dir) runs_dir=$(runs_dir)
 
 
 # 创建虚拟环境
@@ -75,14 +89,14 @@ env:
 
 # 启动分类标注工具
 labelImg: datasets/labels/train/classes.txt
-	. env/bin/activate && labelImg datasets/images/train datasets/labels/train/classes.txt datasets/labels/train/
+	$(env_activate) && labelImg datasets/images/train datasets/labels/train/classes.txt datasets/labels/train/
 # 启动分类标注工具
 labelImg-val: datasets/labels/train/classes.txt
-	. env/bin/activate && labelImg datasets/images/val datasets/labels/train/classes.txt datasets/labels/val/
+	$(env_activate) && labelImg datasets/images/val datasets/labels/train/classes.txt datasets/labels/val/
 # 启动分类标注工具
 labelImg-test: datasets/labels/train/classes.txt
-	. env/bin/activate && labelImg datasets/images/test datasets/labels/train/classes.txt datasets/labels/test/
+	$(env_activate) && labelImg datasets/images/test datasets/labels/train/classes.txt datasets/labels/test/
 
 # 分类的文件
 datasets/labels/train/classes.txt:
-	touch datasets/labels/train/classes.txt
+	echo "" > datasets/labels/train/classes.txt
