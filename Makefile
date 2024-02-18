@@ -36,20 +36,28 @@ weights_dir=$(current_dir)weights
 datasets_dir=$(current_dir)datasets
 runs_dir=$(current_dir)runs
 
-remove_cmd=rm -rf
-#remove_cmd=del
 
 all:
 	@echo $(PLATFORM)
 
 # 清理缓存
-clean:
-	$(remove_cmd) ./runs/detect/predict*
-	$(remove_cmd) ./runs/detect/val*
+clean: clean-$(PLATFORM)
 
 # 清理所有缓存
-clean-all: clean
-	$(remove_cmd) ./runs/detect/train*
+clean-all: clean-all-$(PLATFORM)
+
+clean-unix:
+	rm -rf ./runs/detect/predict*
+	rm -rf ./runs/detect/val*
+
+clean-all-unix: clean-unix
+	rm -rf ./runs/detect/train*
+
+clean-win:
+	for /d %%i in (./runs/detect/predict*) do rd /S /Q "./runs/detect/%%i"
+	for /d %%i in (./runs/detect/val*) do rd /S /Q "./runs/detect/%%i"
+clean-all-win: clean-win
+	for /d %%i in (./runs/detect/train*) do rd /S /Q "./runs/detect/%%i"
 
 # 安装依赖
 install-dev: env
