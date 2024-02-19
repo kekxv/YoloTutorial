@@ -26,7 +26,8 @@
 - `make train` 开始训练
 - `make test` 测试 `image/test` 文件夹的识别结果
 - `make val` 验证
-- `make onnx` 导出 `onnx` 模型，其他的 `ncnn`以及`mnn`可以通过`onnx`模型转换
+- `make onnx` 导出 `onnx` 模型，其他的 ~~`ncnn`~~ 以及`mnn`可以通过`onnx`模型转换
+- `make ncnn` 导出 `ncnn` 模型，通过`onnx`转出来的无法使用
 - `make env` 创建虚拟环境
 - `make labelImg` 启动分类标注工具
 
