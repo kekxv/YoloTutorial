@@ -19,19 +19,21 @@ endif
 # detect,segment,classify,pose,obb
 task=detect
 # 基础模型文件 yolov8n.pt 是最快的
-model=yolov8n.pt
+model=yolov8n-obb.pt
 # 配置文件，里面包含了 class
-config_file=$(current_dir)config.yaml
+config_file=$(current_dir)datasets/data.yaml
 # 图片大小
-imgsz=640
+imgsz=320
 # 训练的epochs，一般来说训练的越大，效果越好，但是也有例外的
-epochs=100
+epochs=1000
 # 训练的结果文件夹，多次训练的文件夹不一样
 train_dir=train
 
 # batch
 batch=-1
 cos_lr=True
+close_mosaic=False
+crop_fraction=0.0
 weight_decay=0.001
 # 识别的阈值
 predict_conf=0.50
@@ -74,19 +76,19 @@ install-dev: env
 
 # 开始训练
 train: update-config clean-all
-	$(env_activate) && yolo task=$(task) mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
+	$(env_activate) && yolo task=$(task) mode=train cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
 
 # 继续训练
 resume: update-config
-	$(env_activate) && yolo task=$(task) mode=train resume=True cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=runs/$(task)/$(train_dir)/weights/last.pt data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
+	$(env_activate) && yolo task=$(task) mode=train resume=True cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) model=runs/$(task)/$(train_dir)/weights/last.pt data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
 
 # 开始训练 epochs
 train-10: update-config
-	$(env_activate) &&  yolo task=$(task) mode=train cos_lr=$(cos_lr) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
+	$(env_activate) &&  yolo task=$(task) mode=train cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
 
 # 测试训练出来的模型
 test: update-config
-	$(env_activate) && yolo $(task) predict conf=$(predict_conf) model=runs/$(task)/$(train_dir)/weights/best.pt source=./datasets/images/test
+	$(env_activate) && yolo $(task) predict conf=$(predict_conf) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) model=runs/$(task)/$(train_dir)/weights/best.pt source=./datasets/images/test
 
 # 验证训练内容
 val: update-config
