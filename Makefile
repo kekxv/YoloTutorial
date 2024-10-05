@@ -19,7 +19,7 @@ endif
 # detect,segment,classify,pose,obb
 task=detect
 # 基础模型文件 yolov8n.pt 是最快的
-model=yolov8n.pt
+model=yolo11n.pt
 # 配置文件，里面包含了 class
 config_file=$(current_dir)datasets/data.yaml
 # 图片大小
