@@ -1,4 +1,4 @@
-# YOLOv8 训练自己的数据
+# YOLO (ultralytics) 训练自己的数据
 
 ## YOLO:简史
 
@@ -11,8 +11,10 @@
 - `YOLOv5`进一步提高了模型的性能，并增加了超参数优化、集成实验跟踪和自动导出为常用导出格式等新功能。
 - `YOLOv6`于 `2022` 年由`美团`开源，目前已用于该公司的许多自主配送机器人。
 - `YOLOv7`增加了额外的任务，如 `COCO` 关键点数据集的姿势估计。
-- `YOLOv8`是`YOLO` 的最新`(20240206)`版本，由`Ultralytics` 提供。`YOLOv8` 支持全方位的视觉 AI
-  任务，包括`检测`、`分割`、`姿态估计`、`跟踪`和`分类`。这种多功能性使用户能够在各种应用和领域中利用`YOLOv8`的功能。
+- `YOLOv8`是`YOLO` 的最新`(20240206)`版本，由`Ultralytics` 提供。`YOLOv8` 支持全方位的视觉 AI 任务，包括`检测`、`分割`、`姿态估计`、`跟踪`和`分类`。这种多功能性使用户能够在各种应用和领域中利用`YOLOv8`的功能。
+- `YOLOv9` 引入了可编程梯度信息 （`PGI`） 和广义高效层聚合网络 （`GELAN`） 等创新方法。
+- `YOLOv10` 是由清华大学的研究人员使用该软件包创建的。 `UltralyticsPython` 软件包创建的。该版本通过引入端到端头（`End-to-End head`），消除了非最大抑制（`NMS`）要求，实现了实时目标检测的进步。
+- `YOLO11` 🚀 NEW: Ultralytics' latest YOLO models delivering state-of-the-art (`SOTA`) performance across multiple tasks, including detection, segmentation, pose estimation, tracking, and classification, leverage capabilities across diverse AI applications and domains.
 
 更多的资料可以查看：[https://docs.ultralytics.com/zh/](https://docs.ultralytics.com/zh/)
 
@@ -155,12 +157,12 @@ deactivate
 ### 训练：
 
 ```shell
-yolo task=detect mode=train model=yolov8n.pt data=config.yaml batch=-1 imgsz=640 epochs=100
+yolo task=detect mode=train model=yolo11n.pt data=config.yaml batch=-1 imgsz=640 epochs=100
 ```
 
 ## 相关文档
 
-`yolov8` 文档
+`ultralytics yolo` 文档
 https://docs.ultralytics.com/zh/quickstart/
 
 在线转换模型类型：
