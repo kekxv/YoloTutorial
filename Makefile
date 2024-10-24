@@ -32,17 +32,20 @@ train_dir=train
 # batch
 batch=-1
 cos_lr=True
-close_mosaic=False
-crop_fraction=0.0
-weight_decay=0.001
+close_mosaic=10
+crop_fraction=1.0
+weight_decay=0.0005
 # 识别的阈值
 predict_conf=0.50
-box=5.0
+box=50.0 # 7.5
+degrees=180
+flipud=1 # 0.0
 
 weights_dir=$(current_dir)weights
 datasets_dir=$(current_dir)datasets
 runs_dir=$(current_dir)runs
 
+TASK_ARGS=mode=train degrees=$(degrees) flipud=$(flipud) cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) batch=$(batch) imgsz=$(imgsz)
 
 all:
 	@echo $(PLATFORM)
@@ -76,19 +79,19 @@ install-dev: env
 
 # 开始训练
 train: update-config clean-all
-	$(env_activate) && yolo task=$(task) mode=train cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
+	$(env_activate) && yolo task=$(task) $(TASK_ARGS) model=$(model) data=$(config_file) epochs=$(epochs)
 
 # 继续训练
 resume: update-config
-	$(env_activate) && yolo task=$(task) mode=train resume=True cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) model=runs/$(task)/$(train_dir)/weights/last.pt data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=$(epochs)
+	$(env_activate) && yolo task=$(task) $(TASK_ARGS) resume=True model=runs/$(task)/$(train_dir)/weights/last.pt data=$(config_file) epochs=$(epochs)
 
 # 开始训练 epochs
 train-10: update-config
-	$(env_activate) &&  yolo task=$(task) mode=train cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) model=$(model) data=$(config_file) batch=$(batch) imgsz=$(imgsz) epochs=10
+	$(env_activate) &&  yolo task=$(task) $(TASK_ARGS) model=$(model) data=$(config_file) epochs=10
 
 # 测试训练出来的模型
 test: update-config
-	$(env_activate) && yolo $(task) predict conf=$(predict_conf) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) model=runs/$(task)/$(train_dir)/weights/best.pt source=./datasets/images/test
+	$(env_activate) && yolo $(task) predict conf=$(predict_conf) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) model=runs/$(task)/$(train_dir)/weights/best.pt source=./datasets/test/images
 
 # 验证训练内容
 val: update-config
@@ -108,18 +111,18 @@ update-config:
 
 # 创建虚拟环境
 env:
-	python3.9 -m venv env || python -m venv env
+	python3.9 -m venv env || python -m venv env || python3 -m venv env
 
 # 启动分类标注工具
-labelImg: datasets/labels/train/classes.txt
-	$(env_activate) && labelImg datasets/images/train datasets/labels/train/classes.txt datasets/labels/train/
+labelImg: datasets/classes.txt
+	$(env_activate) && labelImg datasets/train/images datasets/classes.txt datasets/train/labels/
 # 启动分类标注工具
-labelImg-val: datasets/labels/train/classes.txt
-	$(env_activate) && labelImg datasets/images/val datasets/labels/train/classes.txt datasets/labels/val/
+labelImg-val: datasets/classes.txt
+	$(env_activate) && labelImg datasets/val/images datasets/classes.txt datasets/val/labels/
 # 启动分类标注工具
-labelImg-test: datasets/labels/train/classes.txt
-	$(env_activate) && labelImg datasets/images/test datasets/labels/train/classes.txt datasets/labels/test/
+labelImg-test: datasets/classes.txt
+	$(env_activate) && labelImg datasets/test/images datasets/classes.txt datasets/test/labels/
 
 # 分类的文件
-datasets/labels/train/classes.txt:
-	echo "" > datasets/labels/train/classes.txt
+datasets/classes.txt:
+	echo "" > datasets/classes.txt
