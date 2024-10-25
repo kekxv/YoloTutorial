@@ -1,6 +1,7 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(dir $(mkfile_path))
 
+GPU_CONFIG=
 ifeq ($(OS),Windows_NT)
  PLATFORM=win
  env_activate= .\env\Scripts\activate.bat
@@ -8,6 +9,7 @@ else
  env_activate= . env/bin/activate
  ifeq ($(shell uname),Darwin)
   #PLATFORM=MacOS
+  GPU_CONFIG=device=mps
   PLATFORM=unix
  else
   PLATFORM=unix
@@ -37,15 +39,15 @@ crop_fraction=1.0
 weight_decay=0.0005
 # 识别的阈值
 predict_conf=0.50
-box=50.0 # 7.5
-degrees=180
+box=7.5 # 7.5
+degrees=180 #180
 flipud=1 # 0.0
 
 weights_dir=$(current_dir)weights
 datasets_dir=$(current_dir)datasets
 runs_dir=$(current_dir)runs
 
-TASK_ARGS=mode=train degrees=$(degrees) flipud=$(flipud) cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) batch=$(batch) imgsz=$(imgsz)
+TASK_ARGS=$(GPU_CONFIG) mode=train degrees=$(degrees) flipud=$(flipud) cos_lr=$(cos_lr) crop_fraction=$(crop_fraction) close_mosaic=$(close_mosaic) weight_decay=$(weight_decay) box=$(box) batch=$(batch) imgsz=$(imgsz)
 
 all:
 	@echo $(PLATFORM)
@@ -114,15 +116,21 @@ env:
 	python3.9 -m venv env || python -m venv env || python3 -m venv env
 
 # 启动分类标注工具
-labelImg: datasets/classes.txt
+labelImg: datasets/train/labels/classes.txt
 	$(env_activate) && labelImg datasets/train/images datasets/classes.txt datasets/train/labels/
 # 启动分类标注工具
-labelImg-val: datasets/classes.txt
+labelImg-val: datasets/val/labels/classes.txt
 	$(env_activate) && labelImg datasets/val/images datasets/classes.txt datasets/val/labels/
 # 启动分类标注工具
-labelImg-test: datasets/classes.txt
+labelImg-test: datasets/test/labels/classes.txt
 	$(env_activate) && labelImg datasets/test/images datasets/classes.txt datasets/test/labels/
 
+datasets/test/labels/classes.txt: datasets/classes.txt
+	cp datasets/classes.txt datasets/test/labels/classes.txt
+datasets/train/labels/classes.txt: datasets/classes.txt
+	cp datasets/classes.txt datasets/train/labels/classes.txt
+datasets/val/labels/classes.txt: datasets/classes.txt
+	cp datasets/classes.txt datasets/val/labels/classes.txt
 # 分类的文件
 datasets/classes.txt:
 	echo "" > datasets/classes.txt
