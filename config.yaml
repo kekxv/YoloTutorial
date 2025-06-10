@@ -1,17 +1,20 @@
-path: ./
-train: images/train/
-# 可以改为 images/val
-val: images/train/
-test: images/test/
+path: ./datasets
+train: train/
+val: train/
+test: test/
 
 names:
-  0: driving-license
-  1: driving-license-back
-  2: driver-license
-  3: driver-license-back
-  4: idcard
-  5: idcard-back
-  6: passport
-  7: HongKong-Macao-Taiwan-Pass
-  8: Taiwan-Back-Pass
-  9: Taiwan-Back-Pass-back
+  0: 行驶证
+  1: 行驶证背面
+  2: 驾驶证
+  3: 驾驶证背面
+  4: 身份证
+  5: 身份证背面
+  6: 护照
+  7: 港澳台通行证
+  8: 台湾回乡证
+  9: 台湾回乡证背面
+  10: 澳门居民身份证
+  11: 军官证
+  12: 港澳居民来往内地通行证
+  13: 广东省居住证
