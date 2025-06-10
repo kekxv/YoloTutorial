@@ -72,6 +72,11 @@ BEST_MODEL    ?= $(CURRENT_DIR)runs/$(TASK)/train/weights/best.pt
 LAST_MODEL    ?= $(CURRENT_DIR)runs/$(TASK)/train/weights/last.pt
 # Confidence threshold for CLI prediction
 PREDICT_CONF  ?= 0.50
+# --- Model Export Specific Settings (New & Improved) ---
+EXPORT_MODEL  ?= $(BEST_MODEL)
+EXPORT_IMGSZ  ?= $(IMGSZ)
+EXPORT_ARGS   ?= half=False simplify=True  # Common export flags (e.g., half, int8, simplify)
+
 
 # --- Prediction-to-File Script Settings (Your New Feature) ---
 PREDICT_SCRIPT   ?= tools/predict_and_save.py
@@ -100,7 +105,7 @@ TRAIN_ARGS = $(GPU_CONFIG) mode=train degrees=$(DEGREES) flipud=$(FLIPUD) cos_lr
         install-dev env update-config \
         train resume train-10 \
         val predict-cli predict-to-file \
-        export-onnx export-ncnn \
+        export-onnx export-ncnn export-mnn \
         labelImg labelImg-val labelImg-test labelImg-datas \
         find-duplicates clean-duplicates clean-duplicates-dry-run rename-by-time rename-by-time-dry-run  \
         split-dataset split-dataset-copy \
@@ -142,8 +147,10 @@ help:
 	@echo "                            (Uses predict_and_save.py script)"
 	@echo ""
 	@echo "---------------------- Model Export ----------------------------"
-	@echo "  export-onnx               Export the best model to ONNX format."
-	@echo "  export-ncnn               Export the best model to NCNN format."
+	@echo "  export-onnx               Export the model to ONNX format."
+	@echo "  export-ncnn               Export the model to NCNN format."
+	@echo "  export-mnn                Export the model to MNN format."
+	@echo "    > Override with: EXPORT_MODEL=\$$$(LAST_MODEL) EXPORT_IMGSZ=640 half=True"
 	@echo ""
 	@echo "---------------------- Data Labeling ---------------------------"
 	@echo "  labelImg                  Launch labelImg for the training set."
@@ -362,17 +369,39 @@ rename-by-time-dry-run: env
 	@echo "🧪 [Dry Run] Simulating batch rename for: $(UTIL_DIR)"
 	$(ENV_ACTIVATE) && $(PYTHON) tools/batch_rename.py --dry-run "$(UTIL_DIR)"
 
-# ---------------------------------------------------------------------------
-# Model Export
-# ------------------------------------------------------------------------------
-export-onnx: update-config env
-	$(ENV_ACTIVATE) && yolo export task=$(TASK) model=$(BEST_MODEL) format=onnx
+# ==============================================================================
+# VI. MODEL EXPORT (Refactored for flexibility and OBB/MNN support)
+# ==============================================================================
+# This section has been optimized. You can now easily override the export
+# model and parameters. e.g.:
+# make export-onnx EXPORT_MODEL=$(LAST_MODEL) EXPORT_IMGSZ=640 half=True
 
-export-ncnn: update-config env
-	$(ENV_ACTIVATE) && yolo export task=$(TASK) model=$(BEST_MODEL) format=ncnn
+export-onnx: update-config
+	@echo "🚀 Exporting model to ONNX format..."
+	@echo "  - Task:   $(TASK)"
+	@echo "  - Model:  $(EXPORT_MODEL)"
+	@echo "  - ImgSz:  $(EXPORT_IMGSZ)"
+	@echo "  - Args:   $(EXPORT_ARGS)"
+	$(ENV_ACTIVATE) && yolo export model=$(EXPORT_MODEL) task=$(TASK) format=onnx imgsz=$(EXPORT_IMGSZ) $(EXPORT_ARGS)
+
+export-ncnn: update-config
+	@echo "🚀 Exporting model to NCNN format..."
+	@echo "  - Task:   $(TASK)"
+	@echo "  - Model:  $(EXPORT_MODEL)"
+	@echo "  - ImgSz:  $(EXPORT_IMGSZ)"
+	@echo "  - Args:   $(EXPORT_ARGS)"
+	$(ENV_ACTIVATE) && yolo export model=$(EXPORT_MODEL) task=$(TASK) format=ncnn imgsz=$(EXPORT_IMGSZ) $(EXPORT_ARGS)
+
+export-mnn: update-config
+	@echo "🚀 Exporting model to MNN format..."
+	@echo "  - Task:   $(TASK)"
+	@echo "  - Model:  $(EXPORT_MODEL)"
+	@echo "  - ImgSz:  $(EXPORT_IMGSZ)"
+	@echo "  - Args:   $(EXPORT_ARGS)"
+	$(ENV_ACTIVATE) && yolo export model=$(EXPORT_MODEL) task=$(TASK) format=mnn imgsz=$(EXPORT_IMGSZ) $(EXPORT_ARGS)
 
 # ------------------------------------------------------------------------------
-# Data Labeling Helpers
+# VII. DATA LABELING HELPERS
 # ------------------------------------------------------------------------------
 labelImg: datasets/train/labels/classes.txt env
 	$(ENV_ACTIVATE) && labelImg datasets/train/images datas/classes.txt datasets/train/labels/
@@ -406,7 +435,7 @@ datasets/val/labels/classes.txt: datas/classes.txt
 	cp $< $@
 
 # ------------------------------------------------------------------------------
-# Cleanup (Refactored for simplicity)
+# VIII. CLEANUP (Refactored for simplicity)
 # ------------------------------------------------------------------------------
 clean:
 	@echo "Cleaning prediction and validation artifacts in $(RUNS_DIR)/$(TASK)..."

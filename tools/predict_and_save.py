@@ -8,6 +8,10 @@ def run_inference(model_path, image_dir, label_dir, conf_threshold, task_type='d
     使用 YOLO 模型对图片进行推理，并将结果以 YOLO 格式保存到标签文件中。
     支持 'detect' (标准) 和 'obb' (旋转) 任务。
 
+    输出格式:
+    - 'detect' 任务: class_id x_center y_center width height
+    - 'obb' 任务: class_id x1 y1 x2 y2 x3 y3 x4 y4 (归一化的四个角点)
+
     Args:
         model_path (str): 预训练的 YOLO 模型文件路径 (.pt 文件)。
         image_dir (str): 包含输入图片的文件夹路径。
@@ -16,7 +20,7 @@ def run_inference(model_path, image_dir, label_dir, conf_threshold, task_type='d
         task_type (str): 任务类型, 'detect' 或 'obb'。
     """
     # 1. 加载 YOLO 模型
-    print(f"正在加载模型: {model_path} for task: {task_type}")
+    print(f"正在加载模型: {model_path} (任务类型: {task_type})")
     try:
         model = YOLO(model_path)
     except Exception as e:
@@ -48,23 +52,28 @@ def run_inference(model_path, image_dir, label_dir, conf_threshold, task_type='d
 
         # 根据任务类型选择不同的处理逻辑
         if task_type == 'obb' and result.obb is not None:
-            # --- OBB 任务处理逻辑 ---
-            # result.obb 包含了所有旋转框的信息
-            # obb.xywhr 是归一化的 [x_center, y_center, width, height, rotation_in_radians]
+            # --- OBB 任务处理逻辑 (已修改为输出四个点位) ---
             for obb in result.obb:
                 class_id = int(obb.cls[0])
-                # 获取归一化的坐标和旋转角度（弧度）
-                x_center, y_center, width, height, angle = obb.xywhr[0].tolist()
-                line = f"{class_id} {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f} {angle:.6f}"
+                # 使用 .xyxyxyn 属性直接获取归一化后的四个角点坐标
+                # 格式为 [x1, y1, x2, y2, x3, y3, x4, y4]
+                points = obb.xyxyxyn[0].tolist()
+
+                # 将所有点位坐标格式化为字符串，保留6位小数
+                points_str = " ".join([f"{p:.6f}" for p in points])
+
+                # 组合成最终的行: class_id x1 y1 x2 y2 x3 y3 x4 y4
+                line = f"{class_id} {points_str}"
                 yolo_lines.append(line)
 
         elif task_type == 'detect' and result.boxes is not None:
-            # --- 标准检测任务处理逻辑 ---
+            # --- 标准检测任务处理逻辑 (已修复classid重复的bug) ---
             # result.boxes.xywhn 直接提供了归一化的 [x_center, y_center, width, height]
             for box in result.boxes:
                 class_id = int(box.cls[0])
                 x_center, y_center, width, height = box.xywhn[0].tolist()
-                line = f"{class_id} {class_id} {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}"
+                # 修正: 原脚本中 class_id 写了两次，这里修复为正确的格式
+                line = f"{class_id} {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}"
                 yolo_lines.append(line)
 
         # 如果检测到了物体，则生成标签文件
@@ -88,7 +97,7 @@ if __name__ == "__main__":
         type=str,
         default='detect',
         choices=['detect', 'obb'],
-        help="任务类型: 'detect' for standard bounding boxes, 'obb' for oriented bounding boxes."
+        help="任务类型: 'detect' 用于标准边界框, 'obb' 用于旋转边界框。"
     )
     args = parser.parse_args()
 
