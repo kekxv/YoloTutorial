@@ -1,5 +1,9 @@
 /runs/
 /env/
-/datasets/
+/datasets/*
 /*.pt
 *.cache
+/datas/*
+/*.onnx
+/*.zip
+/.idea
