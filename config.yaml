@@ -1,6 +1,6 @@
 path: ./datasets
 train: train/
-val: train/
+val: val/
 test: test/
 
 names:

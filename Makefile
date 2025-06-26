@@ -43,7 +43,7 @@ endif
 # ------------------------------------------------------------------------------
 # --- Task and Model Settings ---
 # Task type: detect, segment, classify, pose, obb
-TASK          ?= detect
+TASK          ?= obb
 # --- 根据 TASK 自动选择基础模型 ---
 # Base model for training. yolov8n.pt is the smallest and fastest.
 ifeq ($(TASK),obb)
@@ -55,7 +55,7 @@ endif
 CONFIG_FILE   ?= $(CURRENT_DIR)config.yaml
 
 # --- Training Hyperparameters ---
-IMGSZ         ?= 320
+IMGSZ         ?= 640
 EPOCHS        ?= 1000
 BATCH         ?= -1  # -1 for auto-batch
 COS_LR        ?= True
@@ -65,6 +65,7 @@ WEIGHT_DECAY  ?= 0.0005
 DEGREES       ?= 180
 FLIPUD        ?= 1.0
 BOX           ?= 7.5
+EXT_CONFIG    ?= degrees=180.0 shear=5.0 perspective=0.005
 
 # --- Prediction & Export Settings ---
 # Default model to use for prediction/validation/export is the best one from training
@@ -216,18 +217,18 @@ update-config: env
 # Training and Validation
 # ------------------------------------------------------------------------------
 train: update-config
-	@echo "yolo task=$(TASK) $(TRAIN_ARGS) model=$(BASE_MODEL) data=$(CONFIG_FILE) epochs=$(EPOCHS)"
-	$(ENV_ACTIVATE) && yolo task=$(TASK) $(TRAIN_ARGS) model=$(BASE_MODEL) data=$(CONFIG_FILE) epochs=$(EPOCHS)
+	@echo "yolo task=$(TASK) $(TRAIN_ARGS) model=$(BASE_MODEL) data=$(CONFIG_FILE) epochs=$(EPOCHS) $(EXT_CONFIG)"
+	$(ENV_ACTIVATE) && yolo task=$(TASK) $(TRAIN_ARGS) model=$(BASE_MODEL) data=$(CONFIG_FILE) epochs=$(EPOCHS) $(EXT_CONFIG)
 
 resume: update-config
-	$(ENV_ACTIVATE) && yolo task=$(TASK) $(TRAIN_ARGS) resume=True model=$(LAST_MODEL) data=$(CONFIG_FILE) epochs=$(EPOCHS)
+	$(ENV_ACTIVATE) && yolo task=$(TASK) $(TRAIN_ARGS) resume=True model=$(LAST_MODEL) data=$(CONFIG_FILE) epochs=$(EPOCHS) $(EXT_CONFIG)
 
 train-10:
 	make train EPOCHS=10
 
 val: update-config
 	@echo "Validating model: $(BEST_MODEL)"
-	$(ENV_ACTIVATE) && yolo $(TASK) val data=$(CONFIG_FILE) model=$(BEST_MODEL) imgsz=$(IMGSZ)
+	$(ENV_ACTIVATE) && yolo $(TASK) val data=$(CONFIG_FILE) model=$(BEST_MODEL) imgsz=$(IMGSZ) split=test
 
 # ------------------------------------------------------------------------------
 # Prediction (renamed 'test' to 'predict-cli' for clarity)
