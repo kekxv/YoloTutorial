@@ -2,6 +2,8 @@ path: ./datasets
 train: train/
 val: val/
 test: test/
+cache: true
+#workers: 4
 
 names:
   0: 行驶证

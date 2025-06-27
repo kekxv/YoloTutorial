@@ -62,10 +62,10 @@ COS_LR        ?= True
 CLOSE_MOSAIC  ?= 10
 CROP_FRACTION ?= 1.0
 WEIGHT_DECAY  ?= 0.0005
-DEGREES       ?= 180
-FLIPUD        ?= 1.0
+DEGREES       ?= 120
+FLIPUD        ?= 0.0
 BOX           ?= 7.5
-EXT_CONFIG    ?= degrees=180.0 shear=5.0 perspective=0.005
+EXT_CONFIG    ?= degrees=180.0 shear=5.0
 
 # --- Prediction & Export Settings ---
 # Default model to use for prediction/validation/export is the best one from training
